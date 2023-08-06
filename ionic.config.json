@@ -1,0 +1,7 @@
+{
+  "name": "ionic-vue-iot-fan-switch",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
