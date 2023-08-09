@@ -1,5 +1,5 @@
 {
-  "name": "ionic-vue-iot-fan-switch",
+  "name": "com.raupulus.ventilador",
   "integrations": {
     "capacitor": {}
   },

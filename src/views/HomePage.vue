@@ -29,7 +29,7 @@
 
                     <div class="pressure">
                         <strong>Presión</strong>
-                        <p>{{ pressure }}%</p>
+                        <p>{{ pressure }}</p>
                     </div>
 
                     <!--
@@ -85,13 +85,31 @@ export default defineComponent({
         const pressurePath = 'api/states/sensor.esphome_web_827e67_bme280_pressure'
         const turnOnPath = 'api/services/switch/turn_on';
         const turnOffPath = 'api/services/switch/turn_off';
-        const urlBase = 'http://172.18.0.2:8123';
+        const windStatusPath = 'api/states/switch.esphome_web_827e67_rel_0';
+        const urlBase = 'https://172.18.0.2:8123';
 
         const headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token,
         };
+
+
+        const getWindStatus = async () => {
+            const url = `${urlBase}/${windStatusPath}`;
+
+            fetch(url, {
+                method: 'GET',
+                headers: headers,
+            })
+                .then(res => res.json())
+                .then(data => {
+                    checked.value = data.state === 'on';
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+        }
 
         const getTemperature = async () => {
             const url = `${urlBase}/${temperaturePath}`;
@@ -127,6 +145,8 @@ export default defineComponent({
 
         getTemperature();
         getPressure();
+
+        getWindStatus();
 
 
 

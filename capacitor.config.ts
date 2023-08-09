@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'ionic-vue-iot-fan-switch',
+  appId: 'com.raupulus.ventilador',
+  appName: 'Ventilador',
   webDir: 'dist',
   server: {
     androidScheme: 'https'
