@@ -1,5 +1,26 @@
 # ionic-vue-iot-fan-switch-button
 
+## Preparar variables
+
+Antes de comenzar copiar el archivo de variables de entorno:
+
+```bash
+cp src/environment.example.ts src/environment.ts
+```
+
+## Construir para android
+
+```bash
+npx cap add android
+ionic capacitor build android --prod
+```
+
+## Abrir aplicación con android studio
+
+```bash
+npx cap open android --prod
+```
+
 ## Endponts
 
 ## Pedir estado de temperatura
