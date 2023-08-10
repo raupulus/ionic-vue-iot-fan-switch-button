@@ -20,7 +20,7 @@
 
 
             <div id="container">
-                <div class="weather-container">
+                <div v-if="temperature && pressure" class="weather-container">
                     <div class="temperature">
                         <strong>Temperatura</strong>
                         <p>{{ temperature }}°C</p>
@@ -32,12 +32,12 @@
                         <p>{{ pressure }}</p>
                     </div>
 
-                    <!--
-                    <div class="humidity">
-                        <strong>Humedad</strong>
-                        <p>{{ humidity }}%</p>
-                    </div>
-                    -->
+
+                </div>
+
+                <div v-if="humidity" class="humidity">
+                    <strong>Humedad</strong>
+                    <p>{{ humidity }}%</p>
                 </div>
 
                 <ion-grid class="ion-margin-top">
@@ -70,23 +70,25 @@
 import { IonItem, IonIcon, IonLabel, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonToggle, IonRow, IonCol, IonGrid } from '@ionic/vue';
 import { sunnyOutline } from 'ionicons/icons';
 import { defineComponent, ref } from 'vue';
+import { environment } from '@/environment/environment';
 
 export default defineComponent({
     components: { IonIcon, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonItem, IonLabel, IonToggle, IonRow, IonCol, IonGrid },
     setup() {
+
         const checked = ref(false);
         const temperature = ref(0);
         const pressure = ref(0);
         const humidity = ref(0);
 
-        const token = '';
+        const token = environment.TOKEN;
+        const urlBase = environment.URL;
 
-        const temperaturePath = 'api/states/sensor.esphome_web_827e67_bme280_temperature'
-        const pressurePath = 'api/states/sensor.esphome_web_827e67_bme280_pressure'
-        const turnOnPath = 'api/services/switch/turn_on';
-        const turnOffPath = 'api/services/switch/turn_off';
-        const windStatusPath = 'api/states/switch.esphome_web_827e67_rel_0';
-        const urlBase = 'https://172.18.0.2:8123';
+        const temperaturePath = environment.temperaturePath;
+        const pressurePath = environment.pressurePath;
+        const turnOnPath = environment.turnOnPath;
+        const turnOffPath = environment.turnOffPath;
+        const windStatusPath = environment.windStatusPath;
 
         const headers = {
             'Accept': 'application/json',
@@ -107,6 +109,7 @@ export default defineComponent({
                     checked.value = data.state === 'on';
                 })
                 .catch(error => {
+                    checked.value = false;
                     console.log(error);
                 })
         }
@@ -120,9 +123,14 @@ export default defineComponent({
             })
                 .then(res => res.json())
                 .then(data => {
-                    temperature.value = data.state;
+                    if (data.state && !isNaN(data.state)) {
+                        temperature.value = Math.round(data.state);
+                    } else {
+                        temperature.value = 0;
+                    }
                 })
                 .catch(error => {
+                    temperature.value = 0;
                     console.log(error);
                 })
         }
@@ -136,17 +144,30 @@ export default defineComponent({
             })
                 .then(res => res.json())
                 .then(data => {
-                    pressure.value = Math.round(data.state);
+                    if (data.state && !isNaN(data.state)) {
+                        pressure.value = Math.round(data.state);
+                    } else {
+                        pressure.value = 0;
+                    }
                 })
                 .catch(error => {
+                    pressure.value = 0;
                     console.log(error);
                 })
         }
 
         getTemperature();
         getPressure();
-
         getWindStatus();
+
+        setInterval(() => {
+            getTemperature();
+            getPressure();
+        }, 10000);
+
+        setInterval(() => {
+            getWindStatus();
+        }, 3000);
 
 
 
@@ -159,7 +180,7 @@ export default defineComponent({
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({
-                    "entity_id": "switch.esphome_web_827e67_rel_0"
+                    "entity_id": environment.entityID,
                 })
             })
                 .then(res => res.json())
@@ -209,7 +230,6 @@ export default defineComponent({
 .humidity,
 .pressure {
     color: #8c8c8c;
-    width: 50%;
 }
 
 .temperature p,
